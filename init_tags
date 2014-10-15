@@ -1,0 +1,37 @@
+#!/bin/bash
+
+TAGDIRS="cxunix/source/common
+cxunix/source/include
+cxunix/source/CommClient/VirtualServer
+cxunix/source/CommClient/systemrecovery/client
+cxunix/source/CommClient/CvBlkFBR"
+
+FORCE=$1
+
+curdir=`pwd`
+echo $curdir | grep --quiet "/build/"
+if [ $? -eq 0 ]; then
+    node=`echo $curdir | cut -d"/" -f4`
+    echo $node
+    if [ ! -d ~/tags/$node -o "x$FORCE" == "x-f" ]; then
+        mkdir -p ~/tags/$node
+        cd ~/tags/$node
+        # create ctags
+        rm -rf ./dirlist
+        for dir in $TAGDIRS;
+        do
+            echo "/build/10.0/$node/$dir">> ./dirlist
+        done
+        cat ./dirlist
+        echo "Preparing ctags in background..."
+        ctags -B -R -L ./dirlist &
+
+        find `cat ./dirlist` -type f -regex ".*\.\(h\|c\|cpp\|C\|sh\|pl\|py\)" > ./cscope.files
+        sed -i 's/^/\"/g' ./cscope.files
+        sed -i 's/$/\"/g' ./cscope.files
+        echo "Preparing csope in background..."
+        cscope -bq &
+    fi
+else
+    echo "Not within a build directory.."
+fi

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+SYS=$1
+CMD=$2
+pwd=`pwd`
+
+usage() {
+    echo "$0 <build m/c> <cmd>"
+}
+
+if [ -z "$SYS" -o -z "$CMD" ]; then
+    usage
+    exit
+fi
+
+ssh gbuilder@$SYS "cd $pwd; PATH=/opt/gcc-4.3.5/bin/:/opt/gcc-4.3.5/bin/:/opt/gcc-4.3.5/bin/:/usr/kerberos/bin:/opt/gcc-4.3.5/bin:/opt/gcc-4.3.5/bin:/usr/local/bin:/bin:/usr/bin:/usr/X11R6/bin:/usr/vacpp/bin LD_LIBRARY_PATH=/opt/gcc-4.3.5/lib $CMD"
